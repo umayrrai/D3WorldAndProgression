@@ -87,7 +87,6 @@ On every push to `main`, a review bot can comment on your commit. It's optional 
 
 Its comments are public if your repository is. It runs on a throwaway machine with your code, can browse the web, and spends your own BayLeaf allowance.
 
-
 ## Denis target
 
 **Premise and player**: You are metaphorically walking towards the light and need to cross the terrain. You need to gather materials to get across and reach the light.
@@ -100,4 +99,3 @@ Makeable: Boat, Bone Axe, Torch
 **Forgettable**: The gameplay loop seems very simple and unengaging. What I would do about this is have some elements of randomness so each time you play it will be somewhat different. 
 
 **Short on time**: I will drop extra features and make sure that the game has a good core look and style.
-
