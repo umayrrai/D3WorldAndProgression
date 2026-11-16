@@ -102,12 +102,12 @@ Makeable: Boat, Bone Axe, Torch
 
 ## Umayr Target
 
-**Premise and player**: You are trying to reach the light by crossing a dangerous world. You need to collect materials and craft items to help you get through the terrain.
+**Premise and player**: You are exploring an abandoned world and trying to find a way out. You must explore different areas, collect useful materials, and craft tools to help you survive and reach the end.
 
 **Your world's words**: Terrain: River, Dead Trees, Scattered Bones, Massive Spikes. Makeable: Boat, Bone Axe, Torch.
 
-**Look and sound**: I want a dark pixel-art style with a mysterious feeling. The map will take up most of the screen, with a small UI showing the materials I collect. I want quiet sounds like footsteps and crafting sounds.
+**Look and sound**: I want the game to have a dark pixel-art style. I want the world to feel empty and mysterious. The UI will show the items and materials the player collects. I would use simple background music and small sound effects when walking or collecting items.
 
-**Forgettable**: The game might get boring if everything stays the same. I would add random terrain and resources so every playthrough feels a little different.
+**Forgettable**: Players might lose interest if there is not much to discover. I would add hidden materials and different paths so players have reasons to explore the world.
 
-**Short on time**: I will focus on making sure the player can move, collect materials, and craft items. I will work on the main gameplay first before adding extra features.
+**Short on time**: I will focus on making the map, movement, and collecting materials work first. After that, I will add crafting and improve the visuals if I have enough time.
