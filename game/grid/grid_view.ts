@@ -2,7 +2,7 @@
 // Input, the HUD, sound, and the order of events all live outside it.
 import Phaser from "phaser";
 import type { Cell, GameEvent, GameState, Terrain } from "../../core/mod.ts";
-import { terrainAt } from "../../core/mod.ts";
+import { cellKey, terrainAt } from "../../core/mod.ts";
 
 export const CELL_SIZE = 32;
 const VIEW_WIDTH = 800;
@@ -13,10 +13,11 @@ const MARKER_COLOR = 0xf5e6a8;
 const BUMP_COLOR = 0xe0533d;
 
 const TERRAIN_COLORS: Record<Terrain, number> = {
-  grass: 0x5d9e4a,
-  forest: 0x2f6b3a,
-  water: 0x2d5f9e,
-  rock: 0x6e6a66,
+  bones: 0x8a846f,
+  trees: 0x3b2f2a,
+  river: 0x1f3a4d,
+  spikes: 0x4b3d57,
+  barren: 0x2a2825,
 };
 
 // Enough cells to cover the view, plus a margin so that the camera can lag behind
@@ -36,6 +37,9 @@ function cellCenter({ x, y }: Cell): Cell {
 export class GridView extends Phaser.Scene {
   private readonly seed: number;
   private readonly start: Cell;
+  // The cells the player has changed, built only from events that have played.
+  // terrainAt cannot know about changes, and asking the core would show the future.
+  private readonly changed: Record<string, Terrain>;
   private ground!: Phaser.GameObjects.Graphics;
   private marker!: Phaser.GameObjects.Arc;
 
@@ -43,6 +47,7 @@ export class GridView extends Phaser.Scene {
     super("grid");
     this.seed = state.seed;
     this.start = { ...state.player };
+    this.changed = { ...state.changed };
   }
 
   create() {
@@ -82,6 +87,13 @@ export class GridView extends Phaser.Scene {
         return this.walk(event.to);
       case "blocked":
         return this.bump(event.at, event.toward);
+      case "gathered":
+        // Remember the change first: drawCellsAround repaints every nearby cell.
+        this.changed[cellKey(event.at)] = event.now;
+        this.drawCellsAround(event.at);
+        return Promise.resolve(); // A real animation comes in step 2.
+      case "gatherFailed":
+        return Promise.resolve();
       default:
         // A new event type fails to type-check here until it has a presentation.
         event satisfies never;

@@ -37,8 +37,17 @@ export class Controller {
   }
 
   private keyDown(event: KeyboardEvent) {
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    // G gathers from the cell the player stands on. A letter, not Space or Enter,
+    // which a focused button keeps for itself.
+    if (event.key === "g" || event.key === "G") {
+      if (event.repeat) return;
+      this.pressed = { type: "gather" };
+      this.next();
+      return;
+    }
     const direction = ARROWS[event.key];
-    if (!direction || event.ctrlKey || event.metaKey || event.altKey) return;
+    if (!direction) return;
     // Otherwise arrow keys would also scroll the page.
     event.preventDefault();
     if (event.repeat) return;

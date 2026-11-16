@@ -1,5 +1,7 @@
 // The world is a pure function of a seed and coordinates. Nothing here is stored,
 // so the world can be effectively unbounded while saved state stays small.
+// "barren" is never produced by terrainAt: it is what a cell becomes after the
+// player has gathered from it, so it lives in the player's changes, not the seed.
 
 export type Terrain = "bones" | "trees" | "river" | "spikes" | "barren";
 
@@ -27,7 +29,7 @@ export function terrainAt(seed: number, x: number, y: number): Terrain {
   const height = 0.5 + (raw - 0.5) * Math.min(1, Math.hypot(x, y) / 10);
   if (height < 0.3) return "river";
   if (height > 0.7) return "spikes";
-  return noise(seed + 2, x, y, 6) < 0.45 ? "trees" : "barren";
+  return noise(seed + 2, x, y, 6) < 0.45 ? "trees" : "bones";
 }
 
 export function isPassable(terrain: Terrain): boolean {
