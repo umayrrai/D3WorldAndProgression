@@ -99,3 +99,15 @@ Makeable: Boat, Bone Axe, Torch
 **Forgettable**: The gameplay loop seems very simple and unengaging. What I would do about this is have some elements of randomness so each time you play it will be somewhat different. 
 
 **Short on time**: I will drop extra features and make sure that the game has a good core look and style.
+
+## Umayr Target
+
+**Premise and player**: You are trying to reach the light by crossing a dangerous world. You need to collect materials and craft items to help you get through the terrain.
+
+**Your world's words**: Terrain: River, Dead Trees, Scattered Bones, Massive Spikes. Makeable: Boat, Bone Axe, Torch.
+
+**Look and sound**: I want a dark pixel-art style with a mysterious feeling. The map will take up most of the screen, with a small UI showing the materials I collect. I want quiet sounds like footsteps and crafting sounds.
+
+**Forgettable**: The game might get boring if everything stays the same. I would add random terrain and resources so every playthrough feels a little different.
+
+**Short on time**: I will focus on making sure the player can move, collect materials, and craft items. I will work on the main gameplay first before adding extra features.
