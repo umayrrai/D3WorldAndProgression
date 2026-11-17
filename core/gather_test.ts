@@ -26,8 +26,25 @@ Deno.test("gathering from trees adds what the table says and reports it", () => 
     terrain: "trees",
     item: yielded.item,
     amount: yielded.amount,
+    inventory: { [yielded.item]: yielded.amount },
     now: "barren",
   }]);
+});
+
+Deno.test("a gather event keeps its inventory after another gather", () => {
+  const state = stateOn(SEED, "trees");
+  const [first] = apply(state, { type: "gather" });
+
+  if (first?.type !== "gathered") {
+    throw new Error("Expected the first gather to succeed");
+  }
+
+  // Set up a different resource tile while keeping the same inventory.
+  state.player = stateOn(SEED, "bones").player;
+  apply(state, { type: "gather" });
+
+  assertEquals(state.inventory, { wood: 1, bone: 1 });
+  assertEquals(first.inventory, { wood: 1 });
 });
 
 Deno.test("every terrain that yields something gives its row", () => {

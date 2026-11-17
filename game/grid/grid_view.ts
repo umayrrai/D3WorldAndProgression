@@ -2,7 +2,7 @@
 // Input, the HUD, sound, and the order of events all live outside it.
 import Phaser from "phaser";
 import type { Cell, GameEvent, GameState, Terrain } from "../../core/mod.ts";
-import { cellKey, terrainAt } from "../../core/mod.ts";
+import { cellKey, terrainOf } from "../../core/mod.ts";
 
 export const CELL_SIZE = 32;
 const VIEW_WIDTH = 800;
@@ -91,7 +91,7 @@ export class GridView extends Phaser.Scene {
         // Remember the change first: drawCellsAround repaints every nearby cell.
         this.changed[cellKey(event.at)] = event.now;
         this.drawCellsAround(event.at);
-        return Promise.resolve(); // A real animation comes in step 2.
+        return this.gatherPulse();
       case "gatherFailed":
         return Promise.resolve();
       default:
@@ -132,13 +132,32 @@ export class GridView extends Phaser.Scene {
     });
   }
 
+  // animation for a gather event
+  private gatherPulse(): Promise<void> {
+    this.marker.setFillStyle(0xffffff);
+
+    return new Promise((done) => {
+      this.tweens.add({
+        targets: this.marker,
+        scale: 1.4,
+        duration: 80,
+        yoyo: true,
+        onComplete: () => {
+          this.marker.setFillStyle(MARKER_COLOR);
+          done();
+        },
+      });
+    });
+  }
+
   // Paint only what is near the camera. Asking the core again costs little, and
   // the world itself is never stored.
   private drawCellsAround({ x: centerX, y: centerY }: Cell) {
     this.ground.clear();
     for (let y = centerY - CELLS_DOWN; y <= centerY + CELLS_DOWN; y++) {
       for (let x = centerX - CELLS_ACROSS; x <= centerX + CELLS_ACROSS; x++) {
-        this.ground.fillStyle(TERRAIN_COLORS[terrainAt(this.seed, x, y)]);
+        const terrain = terrainOf(this.seed, this.changed, { x, y });
+        this.ground.fillStyle(TERRAIN_COLORS[terrain]);
         this.ground.fillRect(
           x * CELL_SIZE,
           y * CELL_SIZE,

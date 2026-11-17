@@ -45,6 +45,13 @@ export class Hud {
     if (event.type === "gathered") {
       this.changed[cellKey(event.at)] = event.now;
       this.showPosition(event.at.x, event.at.y);
+
+      const rows = Object.entries(event.inventory).map(([item, count]) => {
+        const row = document.createElement("li");
+        row.textContent = `${item}: ${count}`;
+        return row;
+      });
+      element("inventory").replaceChildren(...rows);
     }
   }
 

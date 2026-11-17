@@ -56,6 +56,7 @@ export type GameEvent =
     terrain: Terrain;
     item: string;
     amount: number;
+    inventory: Record<string, number>;
     // What the cell became, so the client can redraw it without asking the core.
     now: Terrain;
   }
@@ -116,6 +117,7 @@ function gather(state: GameState): GameEvent[] {
     terrain,
     item: yielded.item,
     amount: yielded.amount,
+    inventory: { ...state.inventory },
     now: DEPLETED,
   }];
 }

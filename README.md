@@ -94,9 +94,9 @@ Its comments are public if your repository is. It runs on a throwaway machine wi
 **Your world's words**: Terrain: River, Dead Trees, scattered bones, Massive Spikes
 Makeable: Boat, Bone Axe, Torch
 
-**Look and sound**: I would want to go for a dark pixel art style. The map would take up most of the page except for a ui panel showing collected materials. The fonts I would use are a For sounds I would want something quiet and unintrusive, like soft footsteps and crafting sound effects. 
+**Look and sound**: I would want to go for a dark pixel art style. The map would take up most of the page except for a ui panel showing collected materials. The fonts I would use are a For sounds I would want something quiet and unintrusive, like soft footsteps and crafting sound effects.
 
-**Forgettable**: The gameplay loop seems very simple and unengaging. What I would do about this is have some elements of randomness so each time you play it will be somewhat different. 
+**Forgettable**: The gameplay loop seems very simple and unengaging. What I would do about this is have some elements of randomness so each time you play it will be somewhat different.
 
 **Short on time**: I will drop extra features and make sure that the game has a good core look and style.
 

@@ -1,8 +1,8 @@
 /* The page around the grid. Everything here is yours to restyle. */
 body {
   margin: 0;
-  background: #14161a;
-  color: #e8e4da;
+  background: #3b2f2a;
+  color: #e8e1cc;
   font: 14px system-ui, sans-serif;
 }
 
@@ -34,11 +34,34 @@ body {
 }
 
 #hud dt {
-  color: #8d8a82;
+  color: #b8ae95;
 }
 
 #hud dd {
   margin: 0;
+}
+
+#hud h2 {
+  margin: 4px 0 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #8a846f;
+  color: #f5e6a8;
+  font: 600 1.2rem Georgia, serif;
+}
+
+#inventory {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  background: #8a846f;
+  border-radius: 4px;
+}
+
+#inventory li {
+  color: #111111;
+  font-weight: 600;
 }
 
 #live {
@@ -52,10 +75,14 @@ body {
   align-self: start;
   padding: 4px 10px;
   color: inherit;
-  background: #262a31;
-  border: 1px solid #3a3f48;
+  background: #4b3d57;
+  border: 1px solid #746481;
   border-radius: 4px;
   cursor: pointer;
+}
+
+#mute:hover {
+  background: #5d4c6b;
 }
 
 /* Slight tilt and vignette: pure presentation, Phaser untouched. */
