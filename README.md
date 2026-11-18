@@ -92,7 +92,7 @@ Its comments are public if your repository is. It runs on a throwaway machine wi
 **Premise and player**: You are metaphorically walking towards the light and need to cross the terrain. You need to gather materials to get across and reach the light.
 
 **Your world's words**: Terrain: River, Dead Trees, scattered bones, Massive Spikes
-Makeable: Boat, Bone Axe, Torch
+Makeable: Bone Axe, Boat, Torch, Monolith
 
 **Look and sound**: I would want to go for a dark pixel art style. The map would take up most of the page except for a ui panel showing collected materials. The fonts I would use are a For sounds I would want something quiet and unintrusive, like soft footsteps and crafting sound effects.
 
@@ -104,7 +104,7 @@ Makeable: Boat, Bone Axe, Torch
 
 **Premise and player**: You are exploring an abandoned world and trying to find a way out. You must explore different areas, collect useful materials, and craft tools to help you survive and reach the end.
 
-**Your world's words**: Terrain: River, Dead Trees, Scattered Bones, Massive Spikes. Makeable: Boat, Bone Axe, Torch.
+**Your world's words**: Terrain: River, Dead Trees, Scattered Bones, Massive Spikes. Makeable: Bone Axe, Boat, Torch, Monolith.
 
 **Look and sound**: I want the game to have a dark pixel-art style. I want the world to feel empty and mysterious. The UI will show the items and materials the player collects. I would use simple background music and small sound effects when walking or collecting items.
 

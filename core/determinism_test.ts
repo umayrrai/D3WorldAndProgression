@@ -6,6 +6,7 @@ import {
   type GameEvent,
   newGame,
 } from "./mod.ts";
+import { stateOn } from "./test_helpers.ts";
 
 function commands(): Command[] {
   const walk: Direction[] = ["east", "east", "south", "south", "west", "north"];
@@ -44,10 +45,10 @@ Deno.test("state and events survive a trip through JSON", () => {
 // A longer game: walk, gather and craft, so that inventory and recipes are
 // covered by the same promise as movement.
 function playWithCrafting(seed: number) {
-  const state = newGame(seed);
+  const state = stateOn(seed, "bones");
   const events: GameEvent[] = [];
   const directions: Direction[] = ["east", "south", "west", "north"];
-  const crafts = ["boat", "bone_axe", "torch", "nonsense"];
+  const crafts = ["bone_axe", "boat", "torch", "nonsense"];
   for (let i = 0; i < 400; i++) {
     const command: Command = i % 7 === 3
       ? { type: "craft", recipe: crafts[i % crafts.length] }

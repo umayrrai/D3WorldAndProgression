@@ -33,16 +33,23 @@ export function canReach(
   while (changed) {
     changed = false;
 
-    // A terrain opens once the player holds what it asks for, and then its yield
-    // is reachable too. With nothing crafted, only "free" terrain is open.
+    // Entry and gathering can unlock separately, as with walking through trees
+    // before crafting the axe to gather wood.
     for (const [terrain, rule] of Object.entries(entry)) {
       if (entered.has(terrain)) continue;
       const open = rule === "free" ||
         (rule !== "never" && reached.has(rule.item));
       if (!open) continue;
       entered.add(terrain);
-      const yielded = yields[terrain];
-      if (yielded) reached.add(yielded.item);
+      changed = true;
+    }
+
+    for (const [terrain, yielded] of Object.entries(yields)) {
+      if (!yielded || reached.has(yielded.item) || !entered.has(terrain)) {
+        continue;
+      }
+      if (yielded.requires && !reached.has(yielded.requires)) continue;
+      reached.add(yielded.item);
       changed = true;
     }
 

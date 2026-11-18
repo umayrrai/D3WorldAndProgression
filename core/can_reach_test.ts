@@ -1,18 +1,16 @@
 import { assertEquals } from "@std/assert";
 import { canReach } from "./can_reach.ts";
-import { BEACON_RECIPE_ID, ENTRY, RECIPES, YIELDS } from "./mod.ts";
+import { ENTRY, MONOLITH_RECIPE_ID, RECIPES, YIELDS } from "./mod.ts";
 
-// Worked by hand, with the real table. Bare hands enter bones and trees, which
-// give bone and wood. Pass 1 makes the boat and bone axe. Pass 2 opens the river,
-// adds tar, and makes the torch and Beacon. Pass 3 finds no changes.
+// The progression is bone, axe, wood, boat, tar, torch, then Monolith.
 Deno.test("the real table reaches everything, including the tar behind the river", () => {
   const reach = canReach(RECIPES, YIELDS, ENTRY);
 
-  assertEquals(reach.made.has(BEACON_RECIPE_ID), true);
+  assertEquals(reach.made.has(MONOLITH_RECIPE_ID), true);
   assertEquals(reach.unreachable, []);
   assertEquals(
     [...reach.reached].sort(),
-    ["beacon", "bone", "bone_axe", "boat", "tar", "torch", "wood"].sort(),
+    ["monolith", "bone", "bone_axe", "boat", "tar", "torch", "wood"].sort(),
   );
   assertEquals(reach.entered.has("river"), true);
   assertEquals(reach.entered.has("spikes"), false);
@@ -51,7 +49,16 @@ Deno.test("without a recipe for the boat, the tar behind the river is unreachabl
 
   assertEquals(reach.reached.has("tar"), false);
   assertEquals(reach.entered.has("river"), false);
-  assertEquals(reach.unreachable, ["torch", BEACON_RECIPE_ID]);
+  assertEquals(reach.unreachable, ["torch", MONOLITH_RECIPE_ID]);
+});
+
+Deno.test("without an axe the trees are walkable but wood is unreachable", () => {
+  const { bone_axe: _axe, ...withoutAxe } = RECIPES;
+  const reach = canReach(withoutAxe, YIELDS, ENTRY);
+
+  assertEquals(reach.entered.has("trees"), true);
+  assertEquals([...reach.reached], ["bone"]);
+  assertEquals(reach.unreachable, ["boat", "torch", MONOLITH_RECIPE_ID]);
 });
 
 Deno.test("a barrier opened only by what lies behind it stays shut", () => {
@@ -62,5 +69,5 @@ Deno.test("a barrier opened only by what lies behind it stays shut", () => {
 
   assertEquals(reach.entered.has("river"), false);
   assertEquals(reach.reached.has("tar"), false);
-  assertEquals(reach.unreachable, ["torch", BEACON_RECIPE_ID]);
+  assertEquals(reach.unreachable, ["torch", MONOLITH_RECIPE_ID]);
 });

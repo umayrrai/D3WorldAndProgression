@@ -9,11 +9,11 @@ export type Terrain = "bones" | "trees" | "river" | "spikes" | "barren";
 // null means there is nothing to gather. Items are plain strings so that recipes
 // can name any item without touching a union.
 // https://gameprogrammingpatterns.com/type-object.html
-export type Yield = { item: string; amount: number };
+export type Yield = { item: string; amount: number; requires?: string };
 
 export const YIELDS: Record<Terrain, Yield | null> = {
   bones: { item: "bone", amount: 1 },
-  trees: { item: "wood", amount: 1 },
+  trees: { item: "wood", amount: 1, requires: "bone_axe" },
   river: { item: "tar", amount: 1 },
   spikes: null,
   barren: null,
@@ -40,7 +40,7 @@ export type Entry = "free" | "never" | { item: string };
 export const ENTRY: Record<Terrain, Entry> = {
   bones: "free",
   trees: "free",
-  river: { item: "boat" }, // The River also yields tar: the rarest material.
+  river: { item: "boat" }, // The River yields tar
   spikes: "never",
   barren: "free",
 };

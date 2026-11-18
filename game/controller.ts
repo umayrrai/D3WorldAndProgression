@@ -13,6 +13,7 @@ const ARROWS: Record<string, Direction> = {
 // which makes this a Mediator: https://refactoring.guru/design-patterns/mediator
 // There is no frame loop here: a command runs on a key press or when playback ends.
 export class Controller {
+  readonly recorded: Command[] = [];
   private readonly state: GameState;
   private readonly presenter: Presenter;
   // A tap made during a walk, kept until the presenter is free.
@@ -78,6 +79,7 @@ export class Controller {
 
     // Playing nothing would report idle at once, and a held key would land back
     // here until the stack overflowed. No events means there is nothing to wait for.
+    this.recorded.push(command);
     const events = apply(this.state, command);
     if (events.length > 0) this.presenter.play(events);
   }

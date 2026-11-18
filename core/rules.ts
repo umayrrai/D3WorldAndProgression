@@ -2,7 +2,7 @@
 // once, and the events it returns are a record of what happened. Whoever called
 // apply() decides how, or whether, to show them over time.
 
-import { BEACON_RECIPE_ID, type Recipe, RECIPES } from "./recipes.ts";
+import { MONOLITH_RECIPE_ID, type Recipe, RECIPES } from "./recipes.ts";
 import {
   DEPLETED,
   isPassable,
@@ -63,7 +63,7 @@ export type GameEvent =
     // What the cell became, so the client can redraw it without asking the core.
     now: Terrain;
   }
-  | { type: "gatherFailed"; at: Cell; terrain: Terrain }
+  | { type: "gatherFailed"; at: Cell; terrain: Terrain; requires?: string }
   | {
     type: "crafted";
     recipe: string;
@@ -128,13 +128,18 @@ function move(state: GameState, direction: Direction): GameEvent[] {
   return [{ type: "moved", from, to }];
 }
 
-// Gather from the cell the player stands on. A cell that yields nothing, or one
-// already gathered, fails and changes nothing.
+// Gather from the cell the player stands on if entry and gathering are allowed.
 function gather(state: GameState): GameEvent[] {
   const at = { ...state.player };
   const terrain = terrainNow(state, at);
   const yielded = YIELDS[terrain];
-  if (!yielded) return [{ type: "gatherFailed", at, terrain }];
+  if (!yielded || !isPassable(terrain, state.inventory)) {
+    return [{ type: "gatherFailed", at, terrain }];
+  }
+  const requiredTool = yielded.requires;
+  if (requiredTool && (state.inventory[requiredTool] ?? 0) <= 0) {
+    return [{ type: "gatherFailed", at, terrain, requires: requiredTool }];
+  }
   state.inventory[yielded.item] = (state.inventory[yielded.item] ?? 0) +
     yielded.amount;
   state.changed[cellKey(at)] = DEPLETED;
@@ -193,7 +198,7 @@ function craft(state: GameState, id: string): GameEvent[] {
     made: recipe.makes,
     inventory: { ...state.inventory },
   };
-  if (id === BEACON_RECIPE_ID) {
+  if (id === MONOLITH_RECIPE_ID) {
     state.ended = true;
     return [crafted, { type: "ended" }];
   }

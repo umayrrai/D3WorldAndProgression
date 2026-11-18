@@ -10,17 +10,19 @@ export type Recipe = {
   makes: string;
 };
 
-export const BEACON_RECIPE_ID = "beacon";
+export const MONOLITH_RECIPE_ID = "monolith";
 
 // The order of these rows is the order the page lists them and the number keys
 // (1, 2, 3, ...) choose them. Ids are plain strings: items are not a union.
 export const RECIPES: Record<string, Recipe> = {
-  boat: { needs: { wood: 2, bone: 1 }, makes: "boat" },
-  bone_axe: { needs: { bone: 2, wood: 1 }, makes: "bone_axe" },
+  bone_axe: { needs: { bone: 6 }, makes: "bone_axe" },
+  boat: { needs: { wood: 4, bone: 2 }, makes: "boat" },
   torch: {
-    needs: { wood: 1, tar: 1 },
-    tools: { bone_axe: 1 },
+    needs: { wood: 1, tar: 2 },
     makes: "torch",
   },
-  [BEACON_RECIPE_ID]: { needs: { torch: 1, wood: 1 }, makes: "beacon" },
+  [MONOLITH_RECIPE_ID]: {
+    needs: { tar: 4, torch: 3, bone: 4 },
+    makes: "monolith",
+  },
 };

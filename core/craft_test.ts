@@ -1,4 +1,4 @@
-import { assertEquals, assertExists } from "@std/assert";
+import { assertEquals } from "@std/assert";
 import {
   apply,
   type GameState,
@@ -63,32 +63,19 @@ Deno.test("an unknown recipe fails and changes nothing", () => {
   assertEquals(state, snapshot);
 });
 
-Deno.test("a tool must be held but is not used up", () => {
-  const { needs, tools } = RECIPES.torch;
-  assertExists(tools);
-  const withoutAxe = holding(needs);
-  const snapshot = JSON.parse(JSON.stringify(withoutAxe));
-
-  const refused = apply(withoutAxe, { type: "craft", recipe: "torch" });
-
-  assertEquals(withoutAxe, snapshot);
-  assertEquals(refused, [{
-    type: "craftFailed",
-    recipe: "torch",
-    reason: "missing",
-    missing: tools,
-  }]);
-
-  const withAxe = holding({ ...needs, ...tools });
-  apply(withAxe, { type: "craft", recipe: "torch" });
-
-  assertEquals(withAxe.inventory, { ...tools, torch: 1 });
+Deno.test("crafting a torch consumes wood and tar and keeps the axe and boat", () => {
+  const state = holding({ ...RECIPES.torch.needs, bone_axe: 1, boat: 1 });
+  apply(state, { type: "craft", recipe: "torch" });
+  assertEquals(state.inventory, { bone_axe: 1, boat: 1, torch: 1 });
 });
 
 Deno.test("the missing-items query checks ingredients and tools together", () => {
-  const recipe = RECIPES.torch;
+  const recipe = {
+    needs: { wood: 1, tar: 1 },
+    tools: { bone_axe: 1 },
+    makes: "test_item",
+  };
   const { needs, tools } = recipe;
-  assertExists(tools);
   const inventory = { ...needs, tar: needs.tar - 1 };
 
   assertEquals(missingItems(recipe, inventory), { tar: 1, ...tools });
@@ -109,7 +96,7 @@ Deno.test("a crafted event keeps its inventory after the state moves on", () => 
   const boatNeeds = RECIPES.boat.needs;
   const axeNeeds = RECIPES.bone_axe.needs;
   const state = holding({
-    wood: boatNeeds.wood + axeNeeds.wood,
+    wood: boatNeeds.wood,
     bone: boatNeeds.bone + axeNeeds.bone,
   });
   const [first] = apply(state, { type: "craft", recipe: "boat" });

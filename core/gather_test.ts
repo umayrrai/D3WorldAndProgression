@@ -12,27 +12,48 @@ import { stateOn } from "./test_helpers.ts";
 
 const SEED = 121;
 
-Deno.test("gathering from trees adds what the table says and reports it", () => {
+Deno.test("gathering wood unlocks after crafting a six-bone axe", () => {
   const state = stateOn(SEED, "trees");
   const at = { ...state.player };
   const yielded = YIELDS.trees!;
+  assertEquals(isPassable("trees", state.inventory), true);
+  assertEquals(apply(state, { type: "gather" }), [{
+    type: "gatherFailed",
+    at,
+    terrain: "trees",
+    requires: "bone_axe",
+  }]);
+  assertEquals(state.inventory, {});
+  assertEquals(state.changed, {});
+
+  state.inventory.bone = 5;
+  assertEquals(apply(state, { type: "craft", recipe: "bone_axe" }), [{
+    type: "craftFailed",
+    recipe: "bone_axe",
+    reason: "missing",
+    missing: { bone: 1 },
+  }]);
+  state.inventory.bone++;
+  apply(state, { type: "craft", recipe: "bone_axe" });
 
   const events = apply(state, { type: "gather" });
 
-  assertEquals(state.inventory, { [yielded.item]: yielded.amount });
+  const inventory = { bone_axe: 1, [yielded.item]: yielded.amount };
+  assertEquals(state.inventory, inventory);
   assertEquals(events, [{
     type: "gathered",
     at,
     terrain: "trees",
     item: yielded.item,
     amount: yielded.amount,
-    inventory: { [yielded.item]: yielded.amount },
+    inventory,
     now: "barren",
   }]);
 });
 
 Deno.test("a gather event keeps its inventory after another gather", () => {
   const state = stateOn(SEED, "trees");
+  state.inventory.bone_axe = 1;
   const [first] = apply(state, { type: "gather" });
 
   if (first?.type !== "gathered") {
@@ -43,14 +64,16 @@ Deno.test("a gather event keeps its inventory after another gather", () => {
   state.player = stateOn(SEED, "bones").player;
   apply(state, { type: "gather" });
 
-  assertEquals(state.inventory, { wood: 1, bone: 1 });
-  assertEquals(first.inventory, { wood: 1 });
+  assertEquals(state.inventory, { bone_axe: 1, wood: 1, bone: 1 });
+  assertEquals(first.inventory, { bone_axe: 1, wood: 1 });
 });
 
 Deno.test("every terrain that yields something gives its row", () => {
   for (const terrain of ["bones", "trees", "river"] as const) {
     const state = stateOn(SEED, terrain);
     const yielded = YIELDS[terrain]!;
+    if (yielded.requires) state.inventory[yielded.requires] = 1;
+    if (terrain === "river") state.inventory.boat = 1;
 
     apply(state, { type: "gather" });
 
@@ -59,7 +82,7 @@ Deno.test("every terrain that yields something gives its row", () => {
 });
 
 Deno.test("gathering twice from one cell gives nothing the second time", () => {
-  const state = stateOn(SEED, "trees");
+  const state = stateOn(SEED, "bones");
   const at = { ...state.player };
   apply(state, { type: "gather" });
   const afterFirst = JSON.parse(JSON.stringify(state));
@@ -90,7 +113,7 @@ Deno.test("saved state holds only the cells that changed", () => {
 });
 
 Deno.test("a gathered cell stays changed after walking away and back", () => {
-  const state = stateOn(SEED, "trees");
+  const state = stateOn(SEED, "bones");
   const start = { ...state.player };
   apply(state, { type: "gather" });
   const back: Record<Direction, Direction> = {

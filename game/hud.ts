@@ -38,13 +38,18 @@ function describe(event: GameEvent): string {
     case "gathered":
       return `gathered ${event.amount} ${event.item} from ${event.terrain}`;
     case "gatherFailed":
+      if (event.requires) {
+        return `you need a ${
+          label(event.requires)
+        } to gather from ${event.terrain}`;
+      }
       return event.terrain === "barren"
         ? "nothing left to gather here"
         : `nothing to gather from ${event.terrain}`;
     case "crafted":
       return `made a ${label(event.made)}`;
     case "ended":
-      return "The Beacon lights your way out.";
+      return "The Monolith marks your way out.";
     case "craftFailed":
       return event.reason === "unknown"
         ? `there is no recipe called ${event.recipe}`

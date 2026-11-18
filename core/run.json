@@ -1,0 +1,248 @@
+{
+  "seed": 121,
+  "commands": [
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "craft",
+      "recipe": "bone_axe"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "east"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "east"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "east"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "west"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "east"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "craft",
+      "recipe": "boat"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "west"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "south"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "south"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "direction": "west"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "west"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "south"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "move",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "direction": "west"
+    },
+    {
+      "type": "gather"
+    },
+    {
+      "type": "craft",
+      "recipe": "torch"
+    },
+    {
+      "type": "craft",
+      "recipe": "torch"
+    },
+    {
+      "type": "craft",
+      "recipe": "torch"
+    },
+    {
+      "type": "craft",
+      "recipe": "monolith"
+    }
+  ]
+}

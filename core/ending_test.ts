@@ -1,21 +1,21 @@
 import { assertEquals } from "@std/assert";
 import {
   apply,
-  BEACON_RECIPE_ID,
   type Command,
+  MONOLITH_RECIPE_ID,
   newGame,
   RECIPES,
 } from "./mod.ts";
 
-Deno.test("crafting the Beacon ends the game and freezes the state", () => {
+Deno.test("crafting the Monolith ends the game and freezes the state", () => {
   const state = newGame(121);
-  const { needs, makes } = RECIPES[BEACON_RECIPE_ID];
+  const { needs, makes } = RECIPES[MONOLITH_RECIPE_ID];
   state.inventory = { ...needs };
 
-  const events = apply(state, { type: "craft", recipe: BEACON_RECIPE_ID });
+  const events = apply(state, { type: "craft", recipe: MONOLITH_RECIPE_ID });
   const inventory = { [makes]: 1 };
   assertEquals(events, [
-    { type: "crafted", recipe: BEACON_RECIPE_ID, made: makes, inventory },
+    { type: "crafted", recipe: MONOLITH_RECIPE_ID, made: makes, inventory },
     { type: "ended" },
   ]);
   assertEquals(state.inventory, inventory);
@@ -25,7 +25,7 @@ Deno.test("crafting the Beacon ends the game and freezes the state", () => {
   const commands: Command[] = [
     { type: "move", direction: "east" },
     { type: "gather" },
-    { type: "craft", recipe: BEACON_RECIPE_ID },
+    { type: "craft", recipe: MONOLITH_RECIPE_ID },
   ];
   for (const command of commands) {
     assertEquals(apply(state, command), []);
@@ -33,15 +33,15 @@ Deno.test("crafting the Beacon ends the game and freezes the state", () => {
   }
 });
 
-Deno.test("a failed Beacon craft leaves the game active", () => {
+Deno.test("a failed Monolith craft leaves the game active", () => {
   const state = newGame(121);
   const before = JSON.parse(JSON.stringify(state));
 
-  assertEquals(apply(state, { type: "craft", recipe: BEACON_RECIPE_ID }), [{
+  assertEquals(apply(state, { type: "craft", recipe: MONOLITH_RECIPE_ID }), [{
     type: "craftFailed",
-    recipe: BEACON_RECIPE_ID,
+    recipe: MONOLITH_RECIPE_ID,
     reason: "missing",
-    missing: RECIPES[BEACON_RECIPE_ID].needs,
+    missing: RECIPES[MONOLITH_RECIPE_ID].needs,
   }]);
   assertEquals(state.ended, false);
   assertEquals(state, before);

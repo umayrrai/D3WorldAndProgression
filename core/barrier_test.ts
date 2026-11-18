@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert";
-import { apply, isPassable, newGame, terrainNow } from "./mod.ts";
-import { besideTerrain } from "./test_helpers.ts";
+import { apply, isPassable, newGame, RECIPES, terrainNow } from "./mod.ts";
+import { besideTerrain, stateOn } from "./test_helpers.ts";
 
 const SEED = 121;
 
@@ -28,8 +28,9 @@ Deno.test("a river is shut before the boat is crafted and open after", () => {
     terrain: "river",
   }]);
 
-  state.inventory = { wood: 2, bone: 1 };
-  apply(state, { type: "craft", recipe: "boat" });
+  state.inventory = { ...RECIPES.boat.needs };
+  const crafted = apply(state, { type: "craft", recipe: "boat" });
+  assertEquals(crafted[0]?.type, "crafted");
   const open = apply(state, { type: "move", direction: "east" });
 
   assertEquals(open, [{ type: "moved", from: start, to: target }]);
@@ -56,6 +57,19 @@ Deno.test("gathering in the river gives tar and leaves barren land", () => {
   assertEquals(events[0].type, "gathered");
   assertEquals(state.inventory, { boat: 1, tar: 1 });
   assertEquals(terrainNow(state, here), "barren");
+});
+
+Deno.test("tar cannot be gathered without a boat", () => {
+  const state = stateOn(SEED, "river");
+  const events = apply(state, { type: "gather" });
+
+  assertEquals(events, [{
+    type: "gatherFailed",
+    at: state.player,
+    terrain: "river",
+  }]);
+  assertEquals(state.inventory, {});
+  assertEquals(state.changed, {});
 });
 
 Deno.test("a gathered river cell is dry land, open even without the boat", () => {
