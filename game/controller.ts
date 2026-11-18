@@ -18,22 +18,18 @@ export class Controller {
   // A tap made during a walk, kept until the presenter is free.
   private pressed: Command | null = null;
   private held: Direction[] = [];
-  // Runs when nothing is playing and no next command has started, so it is safe
-  // to read the core here. During playback, the core is ahead of what the player
-  // has seen, and reading it would show the future.
-  onSettled: () => void = () => {};
-
   constructor(state: GameState, presenter: Presenter) {
     this.state = state;
     this.presenter = presenter;
-    presenter.onIdle = () => {
-      this.next();
-      // next() may have just started another walk.
-      if (!presenter.busy) this.onSettled();
-    };
+    presenter.onIdle = () => this.next();
     addEventListener("keydown", (event) => this.keyDown(event));
     addEventListener("keyup", (event) => this.keyUp(event));
     addEventListener("blur", () => this.held = []);
+  }
+
+  submit(command: Command) {
+    this.pressed = command;
+    this.next();
   }
 
   private keyDown(event: KeyboardEvent) {
@@ -42,8 +38,7 @@ export class Controller {
     // which a focused button keeps for itself.
     if (event.key === "g" || event.key === "G") {
       if (event.repeat) return;
-      this.pressed = { type: "gather" };
-      this.next();
+      this.submit({ type: "gather" });
       return;
     }
     // 1, 2, 3, ... craft the recipes in the order the page lists them.
@@ -52,8 +47,7 @@ export class Controller {
       : undefined;
     if (recipe) {
       if (event.repeat) return;
-      this.pressed = { type: "craft", recipe };
-      this.next();
+      this.submit({ type: "craft", recipe });
       return;
     }
     const direction = ARROWS[event.key];
@@ -62,8 +56,7 @@ export class Controller {
     event.preventDefault();
     if (event.repeat) return;
     this.held.push(direction);
-    this.pressed = { type: "move", direction };
-    this.next();
+    this.submit({ type: "move", direction });
   }
 
   private keyUp(event: KeyboardEvent) {

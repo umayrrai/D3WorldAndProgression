@@ -1,19 +1,18 @@
 import { assertEquals } from "@std/assert";
 import { canReach } from "./can_reach.ts";
-import { ENTRY, RECIPES, YIELDS } from "./mod.ts";
+import { BEACON_RECIPE_ID, ENTRY, RECIPES, YIELDS } from "./mod.ts";
 
 // Worked by hand, with the real table. Bare hands enter bones and trees, which
-// give bone and wood. Pass 1: the boat and the bone axe are ready, so both are
-// made, and the boat opens the river, which gives tar. Still pass 1, as the
-// procedure adds as it goes: the torch needs wood, tar and the axe, so it is made.
-// Pass 2: nothing new. Everything is reachable, and nothing is left over.
+// give bone and wood. Pass 1 makes the boat and bone axe. Pass 2 opens the river,
+// adds tar, and makes the torch and Beacon. Pass 3 finds no changes.
 Deno.test("the real table reaches everything, including the tar behind the river", () => {
   const reach = canReach(RECIPES, YIELDS, ENTRY);
 
+  assertEquals(reach.made.has(BEACON_RECIPE_ID), true);
   assertEquals(reach.unreachable, []);
   assertEquals(
     [...reach.reached].sort(),
-    ["bone", "bone_axe", "boat", "tar", "torch", "wood"].sort(),
+    ["beacon", "bone", "bone_axe", "boat", "tar", "torch", "wood"].sort(),
   );
   assertEquals(reach.entered.has("river"), true);
   assertEquals(reach.entered.has("spikes"), false);
@@ -52,7 +51,7 @@ Deno.test("without a recipe for the boat, the tar behind the river is unreachabl
 
   assertEquals(reach.reached.has("tar"), false);
   assertEquals(reach.entered.has("river"), false);
-  assertEquals(reach.unreachable, ["torch"]);
+  assertEquals(reach.unreachable, ["torch", BEACON_RECIPE_ID]);
 });
 
 Deno.test("a barrier opened only by what lies behind it stays shut", () => {
@@ -63,5 +62,5 @@ Deno.test("a barrier opened only by what lies behind it stays shut", () => {
 
   assertEquals(reach.entered.has("river"), false);
   assertEquals(reach.reached.has("tar"), false);
-  assertEquals(reach.unreachable, ["torch"]);
+  assertEquals(reach.unreachable, ["torch", BEACON_RECIPE_ID]);
 });

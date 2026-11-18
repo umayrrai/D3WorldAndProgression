@@ -43,6 +43,8 @@ function describe(event: GameEvent): string {
         : `nothing to gather from ${event.terrain}`;
     case "crafted":
       return `made a ${label(event.made)}`;
+    case "ended":
+      return "The Beacon lights your way out.";
     case "craftFailed":
       return event.reason === "unknown"
         ? `there is no recipe called ${event.recipe}`
@@ -65,11 +67,16 @@ export class Hud {
     this.changed = { ...state.changed };
     this.showPosition(state.player.x, state.player.y);
     this.showInventory(state.inventory);
-    this.showRecipes();
   }
 
   show(event: GameEvent) {
-    element("live").textContent = describe(event);
+    const message = describe(event);
+    element("live").textContent = message;
+    if (event.type === "ended") {
+      const banner = element("win-banner");
+      banner.textContent = message;
+      banner.hidden = false;
+    }
     if (event.type === "moved") this.showPosition(event.to.x, event.to.y);
     if (event.type === "gathered") {
       this.changed[cellKey(event.at)] = event.now;
@@ -90,20 +97,23 @@ export class Hud {
     element("inventory").replaceChildren(...rows);
   }
 
-  // The recipe table never changes during play, so reading it here is not
-  // reading the future. The number is the key that crafts it.
-  private showRecipes() {
-    const rows = Object.entries(RECIPES).map(([id, recipe], index) => {
+  bindRecipes(craft: (id: string) => void) {
+    const list = element("recipes");
+    for (const [id, recipe] of Object.entries(RECIPES)) {
       const row = document.createElement("li");
-      const tools = recipe.tools
-        ? ` (with ${Object.keys(recipe.tools).map(label).join(", ")})`
-        : "";
-      row.textContent = `${index + 1}: ${label(id)} = ${
+      const button = document.createElement("button");
+      button.type = "button";
+      const name = label(id);
+      button.textContent = `${name.charAt(0).toUpperCase()}${name.slice(1)} — ${
         listItems(recipe.needs)
-      }${tools}`;
-      return row;
-    });
-    element("recipes").replaceChildren(...rows);
+      }`;
+      button.addEventListener("click", (event) => {
+        craft(id);
+        if (event.detail > 0) button.blur();
+      });
+      row.append(button);
+      list.append(row);
+    }
   }
 
   private showPosition(x: number, y: number) {

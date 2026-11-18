@@ -2,7 +2,7 @@
 // once, and the events it returns are a record of what happened. Whoever called
 // apply() decides how, or whether, to show them over time.
 
-import { RECIPES } from "./recipes.ts";
+import { BEACON_RECIPE_ID, type Recipe, RECIPES } from "./recipes.ts";
 import {
   DEPLETED,
   isPassable,
@@ -24,6 +24,7 @@ export type GameState = {
   inventory: Record<string, number>;
   // Only the cells the player has changed, keyed by cellKey, with what each is now.
   changed: Record<string, Terrain>;
+  ended: boolean;
 };
 
 export function cellKey({ x, y }: Cell): string {
@@ -76,7 +77,8 @@ export type GameEvent =
     // Why: no such recipe, or items short. missing says how many of each.
     reason: "unknown" | "missing";
     missing: Record<string, number>;
-  };
+  }
+  | { type: "ended" };
 
 const STEPS: Record<Direction, Cell> = {
   north: { x: 0, y: -1 },
@@ -87,11 +89,18 @@ const STEPS: Record<Direction, Cell> = {
 
 // Singleton, avoided on purpose: tests make as many games as they need. https://gameprogrammingpatterns.com/singleton.html
 export function newGame(seed: number): GameState {
-  return { seed, player: { x: 0, y: 0 }, inventory: {}, changed: {} };
+  return {
+    seed,
+    player: { x: 0, y: 0 },
+    inventory: {},
+    changed: {},
+    ended: false,
+  };
 }
 
 // The single way in. It updates the state it is given and returns the events.
 export function apply(state: GameState, command: Command): GameEvent[] {
+  if (state.ended) return [];
   switch (command.type) {
     case "move":
       return move(state, command.direction);
@@ -140,6 +149,21 @@ function gather(state: GameState): GameEvent[] {
   }];
 }
 
+export function missingItems(
+  recipe: Recipe,
+  inventory: Readonly<GameState["inventory"]>,
+): Record<string, number> {
+  const missing = new Map<string, number>();
+  for (const wants of [recipe.needs, recipe.tools ?? {}]) {
+    for (const [item, amount] of Object.entries(wants)) {
+      const held = Object.hasOwn(inventory, item) ? inventory[item] : 0;
+      const short = amount - held;
+      if (short > (missing.get(item) ?? 0)) missing.set(item, short);
+    }
+  }
+  return Object.fromEntries(missing);
+}
+
 // Make a recipe's item. Everything is checked before anything is changed, so a
 // failed craft leaves the state exactly as it was.
 function craft(state: GameState, id: string): GameEvent[] {
@@ -152,13 +176,7 @@ function craft(state: GameState, id: string): GameEvent[] {
       missing: {},
     }];
   }
-  const missing: Record<string, number> = {};
-  for (const wants of [recipe.needs, recipe.tools ?? {}]) {
-    for (const [item, amount] of Object.entries(wants)) {
-      const short = amount - (state.inventory[item] ?? 0);
-      if (short > 0) missing[item] = short;
-    }
-  }
+  const missing = missingItems(recipe, state.inventory);
   if (Object.keys(missing).length > 0) {
     return [{ type: "craftFailed", recipe: id, reason: "missing", missing }];
   }
@@ -169,10 +187,15 @@ function craft(state: GameState, id: string): GameEvent[] {
     else delete state.inventory[item];
   }
   state.inventory[recipe.makes] = (state.inventory[recipe.makes] ?? 0) + 1;
-  return [{
+  const crafted: GameEvent = {
     type: "crafted",
     recipe: id,
     made: recipe.makes,
     inventory: { ...state.inventory },
-  }];
+  };
+  if (id === BEACON_RECIPE_ID) {
+    state.ended = true;
+    return [crafted, { type: "ended" }];
+  }
+  return [crafted];
 }

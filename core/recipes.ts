@@ -1,5 +1,4 @@
-// What the player can make. Like YIELDS, this is data: a new recipe is a new row
-// here, and the craft rule in rules.ts never changes for it.
+// What the player can make. Like YIELDS, this data drives the common craft rule.
 // Type Object: https://gameprogrammingpatterns.com/type-object.html
 
 export type Recipe = {
@@ -11,6 +10,8 @@ export type Recipe = {
   makes: string;
 };
 
+export const BEACON_RECIPE_ID = "beacon";
+
 // The order of these rows is the order the page lists them and the number keys
 // (1, 2, 3, ...) choose them. Ids are plain strings: items are not a union.
 export const RECIPES: Record<string, Recipe> = {
@@ -21,4 +22,5 @@ export const RECIPES: Record<string, Recipe> = {
     tools: { bone_axe: 1 },
     makes: "torch",
   },
+  [BEACON_RECIPE_ID]: { needs: { torch: 1, wood: 1 }, makes: "beacon" },
 };
