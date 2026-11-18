@@ -112,5 +112,5 @@ Deno.test("a gathered cell stays changed after walking away and back", () => {
   assertEquals(walked, true, "the player had a passable neighbour");
   assertEquals(state.player, start);
   assertEquals(terrainNow(state, start), "barren");
-  assertEquals(isPassable(terrainNow(state, start)), true);
+  assertEquals(isPassable(terrainNow(state, start), {}), true);
 });

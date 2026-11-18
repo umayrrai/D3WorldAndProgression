@@ -1,5 +1,6 @@
 import {
   cellKey,
+  ENTRY,
   type GameEvent,
   type GameState,
   RECIPES,
@@ -26,8 +27,14 @@ function describe(event: GameEvent): string {
   switch (event.type) {
     case "moved":
       return `moved to ${event.to.x}, ${event.to.y}`;
-    case "blocked":
-      return `blocked by ${event.terrain} at ${event.toward.x}, ${event.toward.y}`;
+    case "blocked": {
+      // ENTRY is fixed data, so reading it here never shows the future.
+      const entry = ENTRY[event.terrain];
+      const needs = typeof entry === "object"
+        ? ` (you need a ${label(entry.item)})`
+        : "";
+      return `blocked by ${event.terrain} at ${event.toward.x}, ${event.toward.y}${needs}`;
+    }
     case "gathered":
       return `gathered ${event.amount} ${event.item} from ${event.terrain}`;
     case "gatherFailed":

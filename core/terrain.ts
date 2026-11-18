@@ -32,8 +32,28 @@ export function terrainAt(seed: number, x: number, y: number): Terrain {
   return noise(seed + 2, x, y, 6) < 0.45 ? "trees" : "bones";
 }
 
-export function isPassable(terrain: Terrain): boolean {
-  return terrain !== "river" && terrain !== "spikes";
+// What a terrain asks of a player who wants to stand on it. Data, like YIELDS:
+// "free" is open to anyone, "never" is a permanent wall, and { item } is a barrier
+// that opens for a player holding that item. The opener is never used up.
+export type Entry = "free" | "never" | { item: string };
+
+export const ENTRY: Record<Terrain, Entry> = {
+  bones: "free",
+  trees: "free",
+  river: { item: "boat" }, // The River also yields tar: the rarest material.
+  spikes: "never",
+  barren: "free",
+};
+
+// May a player holding `held` stand here? Pass {} for a player with nothing.
+export function isPassable(
+  terrain: Terrain,
+  held: Record<string, number>,
+): boolean {
+  const entry = ENTRY[terrain];
+  if (entry === "free") return true;
+  if (entry === "never") return false;
+  return (held[entry.item] ?? 0) > 0;
 }
 
 // Value noise: random numbers at coarse grid points, blended between them, so
