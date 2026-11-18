@@ -2,6 +2,7 @@
 // once, and the events it returns are a record of what happened. Whoever called
 // apply() decides how, or whether, to show them over time.
 
+import { RECIPES } from "./recipes.ts";
 import {
   DEPLETED,
   isPassable,
@@ -44,7 +45,8 @@ export function terrainNow(state: GameState, cell: Cell): Terrain {
 // Command: https://gameprogrammingpatterns.com/command.html
 export type Command =
   | { type: "move"; direction: Direction }
-  | { type: "gather" };
+  | { type: "gather" }
+  | { type: "craft"; recipe: string };
 
 // Domain Event: https://martinfowler.com/eaaDev/DomainEvent.html
 export type GameEvent =
@@ -60,7 +62,21 @@ export type GameEvent =
     // What the cell became, so the client can redraw it without asking the core.
     now: Terrain;
   }
-  | { type: "gatherFailed"; at: Cell; terrain: Terrain };
+  | { type: "gatherFailed"; at: Cell; terrain: Terrain }
+  | {
+    type: "crafted";
+    recipe: string;
+    made: string;
+    // A copy, like the one in "gathered": the state's inventory keeps changing.
+    inventory: Record<string, number>;
+  }
+  | {
+    type: "craftFailed";
+    recipe: string;
+    // Why: no such recipe, or items short. missing says how many of each.
+    reason: "unknown" | "missing";
+    missing: Record<string, number>;
+  };
 
 const STEPS: Record<Direction, Cell> = {
   north: { x: 0, y: -1 },
@@ -81,6 +97,8 @@ export function apply(state: GameState, command: Command): GameEvent[] {
       return move(state, command.direction);
     case "gather":
       return gather(state);
+    case "craft":
+      return craft(state, command.recipe);
   }
 }
 
@@ -119,5 +137,42 @@ function gather(state: GameState): GameEvent[] {
     amount: yielded.amount,
     inventory: { ...state.inventory },
     now: DEPLETED,
+  }];
+}
+
+// Make a recipe's item. Everything is checked before anything is changed, so a
+// failed craft leaves the state exactly as it was.
+function craft(state: GameState, id: string): GameEvent[] {
+  const recipe = Object.hasOwn(RECIPES, id) ? RECIPES[id] : undefined;
+  if (!recipe) {
+    return [{
+      type: "craftFailed",
+      recipe: id,
+      reason: "unknown",
+      missing: {},
+    }];
+  }
+  const missing: Record<string, number> = {};
+  for (const wants of [recipe.needs, recipe.tools ?? {}]) {
+    for (const [item, amount] of Object.entries(wants)) {
+      const short = amount - (state.inventory[item] ?? 0);
+      if (short > 0) missing[item] = short;
+    }
+  }
+  if (Object.keys(missing).length > 0) {
+    return [{ type: "craftFailed", recipe: id, reason: "missing", missing }];
+  }
+  for (const [item, amount] of Object.entries(recipe.needs)) {
+    const left = state.inventory[item] - amount;
+    // An item that runs out is absent again, as if never held.
+    if (left > 0) state.inventory[item] = left;
+    else delete state.inventory[item];
+  }
+  state.inventory[recipe.makes] = (state.inventory[recipe.makes] ?? 0) + 1;
+  return [{
+    type: "crafted",
+    recipe: id,
+    made: recipe.makes,
+    inventory: { ...state.inventory },
   }];
 }

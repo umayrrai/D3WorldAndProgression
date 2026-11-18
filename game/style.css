@@ -59,6 +59,20 @@ body {
   border-radius: 4px;
 }
 
+#recipes {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 8px;
+  list-style: none;
+  border: 1px solid #8a846f;
+  border-radius: 4px;
+}
+
+#recipes li {
+  color: #e8e1cc;
+}
+
 #inventory li {
   color: #111111;
   font-weight: 600;

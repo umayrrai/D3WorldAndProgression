@@ -1,4 +1,4 @@
-import { apply, type Command, type Direction } from "../core/mod.ts";
+import { apply, type Command, type Direction, RECIPES } from "../core/mod.ts";
 import type { GameState } from "../core/mod.ts";
 import type { Presenter } from "./presenter.ts";
 
@@ -41,19 +41,25 @@ export class Controller {
     // G gathers from the cell the player stands on. A letter, not Space or Enter,
     // which a focused button keeps for itself.
     if (event.key === "g" || event.key === "G") {
+      // 1, 2, 3, ... craft the recipes in the order the page lists them.
+      const recipe = /^[1-9]$/.test(event.key)
+        ? Object.keys(RECIPES)[Number(event.key) - 1]
+        : undefined;
+      if (recipe) {
+        if (event.repeat) return;
+        this.pressed = { type: "craft", recipe };
+        this.next();
+        return;
+      }
+      const direction = ARROWS[event.key];
+      if (!direction) return;
+      // Otherwise arrow keys would also scroll the page.
+      event.preventDefault();
       if (event.repeat) return;
-      this.pressed = { type: "gather" };
+      this.held.push(direction);
+      this.pressed = { type: "move", direction };
       this.next();
-      return;
     }
-    const direction = ARROWS[event.key];
-    if (!direction) return;
-    // Otherwise arrow keys would also scroll the page.
-    event.preventDefault();
-    if (event.repeat) return;
-    this.held.push(direction);
-    this.pressed = { type: "move", direction };
-    this.next();
   }
 
   private keyUp(event: KeyboardEvent) {

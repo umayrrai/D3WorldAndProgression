@@ -40,3 +40,30 @@ Deno.test("state and events survive a trip through JSON", () => {
 
   assertEquals(JSON.parse(JSON.stringify(played)), played);
 });
+
+// A longer game: walk, gather and craft, so that inventory and recipes are
+// covered by the same promise as movement.
+function playWithCrafting(seed: number) {
+  const state = newGame(seed);
+  const events: GameEvent[] = [];
+  const directions: Direction[] = ["east", "south", "west", "north"];
+  const crafts = ["boat", "bone_axe", "torch", "nonsense"];
+  for (let i = 0; i < 400; i++) {
+    const command: Command = i % 7 === 3
+      ? { type: "craft", recipe: crafts[i % crafts.length] }
+      : i % 3 === 0
+      ? { type: "gather" }
+      : { type: "move", direction: directions[(i * i + i) % 4] };
+    events.push(...apply(state, command));
+  }
+  return { state, events };
+}
+
+Deno.test("gathering and crafting are deterministic too", () => {
+  const first = playWithCrafting(121);
+  const second = playWithCrafting(121);
+
+  assertEquals(first, second);
+  assertEquals(first.events.some((event) => event.type === "gathered"), true);
+  assertEquals(JSON.parse(JSON.stringify(first)), first);
+});

@@ -91,8 +91,12 @@ export class GridView extends Phaser.Scene {
         // Remember the change first: drawCellsAround repaints every nearby cell.
         this.changed[cellKey(event.at)] = event.now;
         this.drawCellsAround(event.at);
-        return this.gatherPulse();
+        return this.pulse();
       case "gatherFailed":
+        return Promise.resolve();
+      case "crafted":
+        return this.pulse();
+      case "craftFailed":
         return Promise.resolve();
       default:
         // A new event type fails to type-check here until it has a presentation.
@@ -133,7 +137,7 @@ export class GridView extends Phaser.Scene {
   }
 
   // animation for a gather event
-  private gatherPulse(): Promise<void> {
+  private pulse(): Promise<void> {
     this.marker.setFillStyle(0xffffff);
 
     return new Promise((done) => {
