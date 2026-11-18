@@ -41,3 +41,20 @@ Deno.test("no recipe makes an item that terrain already gives", () => {
     assertEquals(gathered.has(recipe.makes), false, `${id} makes a raw item`);
   }
 });
+
+Deno.test("a recipe made once does not make an item another recipe uses up", () => {
+  // The fixpoint ignores amounts, so it cannot see this: marking the torch as
+  // once would leave the monolith, which needs three, impossible to make.
+  const consumed = new Set(
+    Object.values(RECIPES).flatMap((recipe) => Object.keys(recipe.needs)),
+  );
+  for (const [id, recipe] of Object.entries(RECIPES)) {
+    if (recipe.once) {
+      assertEquals(
+        consumed.has(recipe.makes),
+        false,
+        `${id} is once but used up`,
+      );
+    }
+  }
+});

@@ -122,3 +122,53 @@ Deno.test("a new recipe row works with no new rule code", () => {
     delete RECIPES.test_charm;
   }
 });
+
+Deno.test("a tool that is only ever held cannot be crafted twice", () => {
+  const { needs } = RECIPES.bone_axe;
+  const state = holding({ bone: 2 * needs.bone });
+  apply(state, { type: "craft", recipe: "bone_axe" });
+  const afterFirst = JSON.parse(JSON.stringify(state));
+
+  const events = apply(state, { type: "craft", recipe: "bone_axe" });
+
+  assertEquals(events, [{
+    type: "craftFailed",
+    recipe: "bone_axe",
+    reason: "owned",
+    missing: {},
+  }]);
+  assertEquals(state, afterFirst);
+});
+
+Deno.test("the boat is also crafted once", () => {
+  const { needs } = RECIPES.boat;
+  const state = holding({ wood: 2 * needs.wood, bone: 2 * needs.bone });
+  apply(state, { type: "craft", recipe: "boat" });
+
+  const events = apply(state, { type: "craft", recipe: "boat" });
+
+  assertEquals(events[0].type, "craftFailed");
+  assertEquals(state.inventory.boat, 1);
+});
+
+Deno.test("a player who has the axe hears that, not what an axe costs", () => {
+  const state = holding({ bone_axe: 1 });
+
+  const events = apply(state, { type: "craft", recipe: "bone_axe" });
+
+  assertEquals(events, [{
+    type: "craftFailed",
+    recipe: "bone_axe",
+    reason: "owned",
+    missing: {},
+  }]);
+});
+
+Deno.test("a tool can still be crafted again once it is gone from the inventory", () => {
+  const state = holding({ bone: RECIPES.bone_axe.needs.bone });
+
+  assertEquals(
+    apply(state, { type: "craft", recipe: "bone_axe" })[0].type,
+    "crafted",
+  );
+});

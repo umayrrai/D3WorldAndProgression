@@ -75,7 +75,7 @@ export type GameEvent =
     type: "craftFailed";
     recipe: string;
     // Why: no such recipe, or items short. missing says how many of each.
-    reason: "unknown" | "missing";
+    reason: "unknown" | "missing" | "owned";
     missing: Record<string, number>;
   }
   | { type: "ended" };
@@ -181,7 +181,19 @@ function craft(state: GameState, id: string): GameEvent[] {
       missing: {},
     }];
   }
-  const missing = missingItems(recipe, state.inventory);
+  // Checked before the missing items: a player who has an axe should hear that,
+  // not what an axe would cost.
+  if (recipe.once && (state.inventory[recipe.makes] ?? 0) > 0) {
+    return [{ type: "craftFailed", recipe: id, reason: "owned", missing: {} }];
+  }
+
+  const missing: Record<string, number> = {};
+  for (const wants of [recipe.needs, recipe.tools ?? {}]) {
+    for (const [item, amount] of Object.entries(wants)) {
+      const short = amount - (state.inventory[item] ?? 0);
+      if (short > 0) missing[item] = short;
+    }
+  }
   if (Object.keys(missing).length > 0) {
     return [{ type: "craftFailed", recipe: id, reason: "missing", missing }];
   }

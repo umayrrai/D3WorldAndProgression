@@ -8,6 +8,7 @@ export type Recipe = {
   tools?: Record<string, number>;
   // The one item this makes.
   makes: string;
+  once?: true;
 };
 
 export const MONOLITH_RECIPE_ID = "monolith";
@@ -15,8 +16,8 @@ export const MONOLITH_RECIPE_ID = "monolith";
 // The order of these rows is the order the page lists them and the number keys
 // (1, 2, 3, ...) choose them. Ids are plain strings: items are not a union.
 export const RECIPES: Record<string, Recipe> = {
-  bone_axe: { needs: { bone: 6 }, makes: "bone_axe" },
-  boat: { needs: { wood: 4, bone: 2 }, makes: "boat" },
+  bone_axe: { needs: { bone: 6 }, makes: "bone_axe", once: true },
+  boat: { needs: { wood: 4, bone: 2 }, makes: "boat", once: true },
   torch: {
     needs: { wood: 1, tar: 2 },
     makes: "torch",

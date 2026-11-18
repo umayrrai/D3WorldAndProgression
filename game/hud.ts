@@ -51,11 +51,15 @@ function describe(event: GameEvent): string {
     case "ended":
       return "The Monolith marks your way out.";
     case "craftFailed":
-      return event.reason === "unknown"
-        ? `there is no recipe called ${event.recipe}`
-        : `cannot make a ${label(event.recipe)}: need ${
-          listItems(event.missing)
-        } more`;
+      if (event.reason === "unknown") {
+        return `there is no recipe called ${event.recipe}`;
+      }
+      if (event.reason === "owned") {
+        return `you already have a ${label(event.recipe)}`;
+      }
+      return `cannot make a ${label(event.recipe)}: need ${
+        listItems(event.missing)
+      } more`;
   }
 }
 
