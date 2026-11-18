@@ -142,7 +142,8 @@ function gather(state: GameState): GameEvent[] {
   }
   state.inventory[yielded.item] = (state.inventory[yielded.item] ?? 0) +
     yielded.amount;
-  state.changed[cellKey(at)] = DEPLETED;
+  // A tool-gated yield is renewable: only open ground is used up.
+  if (!requiredTool) state.changed[cellKey(at)] = DEPLETED;
   return [{
     type: "gathered",
     at,

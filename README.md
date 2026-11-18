@@ -40,7 +40,7 @@ another world. `deno task ci` runs every check.
    game.controller.recorded }))` in the browser console, paste it into
    `core/run.json`, and run `deno task fmt`.
 
-# D3 starter
+## D3 starter
 
 A walking skeleton: one thin slice of a game that works from end to end. The player moves gridwise over a big seeded world, with a game core that knows nothing about Phaser and a Phaser client that presents what the core reports. Assignment instructions are on Canvas.
 
