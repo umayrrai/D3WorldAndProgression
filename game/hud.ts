@@ -3,6 +3,7 @@ import {
   ENTRY,
   type GameEvent,
   type GameState,
+  missingItems,
   RECIPES,
   type Terrain,
   terrainOf,
@@ -64,9 +65,11 @@ function describe(event: GameEvent): string {
 }
 
 // The readout, as ordinary page elements that CSS can style and that assistive
-// tools can read. It changes only as events play.
+// tools can read. The readout follows events, and recipe readiness updates
+// after the controller has drained input and playback.
 export class Hud {
   private readonly seed: number;
+  private readonly recipeButtons = new Map<string, HTMLButtonElement>();
   // Changed cells, built only from events that have played. The core may already
   // be ahead of what the player has seen, so the HUD never asks it.
   private readonly changed: Record<string, Terrain>;
@@ -108,20 +111,33 @@ export class Hud {
 
   bindRecipes(craft: (id: string) => void) {
     const list = element("recipes");
-    for (const [id, recipe] of Object.entries(RECIPES)) {
+    for (const id of Object.keys(RECIPES)) {
       const row = document.createElement("li");
       const button = document.createElement("button");
       button.type = "button";
-      const name = label(id);
-      button.textContent = `${name.charAt(0).toUpperCase()}${name.slice(1)} — ${
-        listItems(recipe.needs)
-      }`;
+      this.recipeButtons.set(id, button);
       button.addEventListener("click", (event) => {
         craft(id);
         if (event.detail > 0) button.blur();
       });
       row.append(button);
       list.append(row);
+    }
+  }
+
+  updateRecipes(inventory: Readonly<GameState["inventory"]>) {
+    for (const [id, button] of this.recipeButtons) {
+      const recipe = RECIPES[id];
+      const name = label(id);
+      const missing = listItems(missingItems(recipe, inventory));
+      let status = missing ? `Missing ${missing}` : "Ready";
+      if (recipe.once && (inventory[recipe.makes] ?? 0) > 0) {
+        status = "Already owned";
+      }
+      const text = `${name.charAt(0).toUpperCase()}${name.slice(1)} - ${
+        listItems(recipe.needs)
+      } - ${status}`;
+      if (button.textContent !== text) button.textContent = text;
     }
   }
 

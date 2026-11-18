@@ -83,6 +83,27 @@ Deno.test("the missing-items query checks ingredients and tools together", () =>
   assertEquals(missingItems(recipe, { ...needs, ...tools }), {});
 });
 
+Deno.test("crafting and the missing-items query agree on overlapping requirements", () => {
+  const id = "test_bone_charm";
+  const recipe = { needs: { bone: 4 }, tools: { bone: 2 }, makes: "charm" };
+  RECIPES[id] = recipe;
+  try {
+    const state = holding({ bone: 1 });
+    const before = JSON.parse(JSON.stringify(state));
+
+    assertEquals(missingItems(recipe, state.inventory), { bone: 3 });
+    assertEquals(apply(state, { type: "craft", recipe: id }), [{
+      type: "craftFailed",
+      recipe: id,
+      reason: "missing",
+      missing: { bone: 3 },
+    }]);
+    assertEquals(state, before);
+  } finally {
+    delete RECIPES[id];
+  }
+});
+
 Deno.test("an item used up entirely is absent, not zero", () => {
   const state = holding(RECIPES.boat.needs);
 

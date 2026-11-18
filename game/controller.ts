@@ -19,7 +19,11 @@ export class Controller {
   // A tap made during a walk, kept until the presenter is free.
   private pressed: Command | null = null;
   private held: Direction[] = [];
-  constructor(state: GameState, presenter: Presenter) {
+  constructor(
+    state: GameState,
+    presenter: Presenter,
+    private readonly onSettled: () => void,
+  ) {
     this.state = state;
     this.presenter = presenter;
     presenter.onIdle = () => this.next();
@@ -75,12 +79,16 @@ export class Controller {
     const command: Command | null = this.pressed ??
       (held ? { type: "move", direction: held } : null);
     this.pressed = null;
-    if (!command) return;
+    if (!command) {
+      this.onSettled();
+      return;
+    }
 
     // Playing nothing would report idle at once, and a held key would land back
     // here until the stack overflowed. No events means there is nothing to wait for.
     this.recorded.push(command);
     const events = apply(this.state, command);
     if (events.length > 0) this.presenter.play(events);
+    else this.onSettled();
   }
 }

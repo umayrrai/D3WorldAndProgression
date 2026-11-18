@@ -51,6 +51,32 @@ Deno.test("gathering wood unlocks after crafting a six-bone axe", () => {
   }]);
 });
 
+Deno.test("gathering wood uses up the tree tile", () => {
+  const state = stateOn(SEED, "trees");
+  state.inventory.bone_axe = 1;
+  const at = { ...state.player };
+
+  const first = apply(state, { type: "gather" });
+
+  assertEquals(state.inventory, { bone_axe: 1, wood: 1 });
+  assertEquals(terrainNow(state, at), "barren");
+  assertEquals(first, [{
+    type: "gathered",
+    at,
+    terrain: "trees",
+    item: "wood",
+    amount: 1,
+    inventory: { bone_axe: 1, wood: 1 },
+    now: "barren",
+  }]);
+
+  const afterFirst = JSON.parse(JSON.stringify(state));
+  const second = apply(state, { type: "gather" });
+
+  assertEquals(second, [{ type: "gatherFailed", at, terrain: "barren" }]);
+  assertEquals(state, afterFirst);
+});
+
 Deno.test("a gather event keeps its inventory after another gather", () => {
   const state = stateOn(SEED, "trees");
   state.inventory.bone_axe = 1;

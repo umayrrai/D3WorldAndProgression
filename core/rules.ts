@@ -142,8 +142,7 @@ function gather(state: GameState): GameEvent[] {
   }
   state.inventory[yielded.item] = (state.inventory[yielded.item] ?? 0) +
     yielded.amount;
-  // A tool-gated yield is renewable: only open ground is used up.
-  if (!requiredTool) state.changed[cellKey(at)] = DEPLETED;
+  state.changed[cellKey(at)] = DEPLETED;
   return [{
     type: "gathered",
     at,
@@ -188,13 +187,7 @@ function craft(state: GameState, id: string): GameEvent[] {
     return [{ type: "craftFailed", recipe: id, reason: "owned", missing: {} }];
   }
 
-  const missing: Record<string, number> = {};
-  for (const wants of [recipe.needs, recipe.tools ?? {}]) {
-    for (const [item, amount] of Object.entries(wants)) {
-      const short = amount - (state.inventory[item] ?? 0);
-      if (short > 0) missing[item] = short;
-    }
-  }
+  const missing = missingItems(recipe, state.inventory);
   if (Object.keys(missing).length > 0) {
     return [{ type: "craftFailed", recipe: id, reason: "missing", missing }];
   }

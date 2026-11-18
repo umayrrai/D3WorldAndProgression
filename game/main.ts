@@ -19,8 +19,10 @@ const sounds = new Sounds(
 );
 const grid = await startGridView(document.getElementById("grid")!, state);
 const presenter = new Presenter([grid, hud, sounds]);
-const controller = new Controller(state, presenter);
+const updateRecipes = () => hud.updateRecipes(state.inventory);
+const controller = new Controller(state, presenter, updateRecipes);
 hud.bindRecipes((recipe) => controller.submit({ type: "craft", recipe }));
+updateRecipes();
 
 // For poking at in the browser console, such as comparing logical state with
 // presentation state: game.state
