@@ -1,3 +1,45 @@
+# D3 World and Progression
+
+**Play it:** https://umayrrai.github.io/D3WorldAndProgression/
+
+**Target.** You are walking toward a light through an abandoned, empty world.
+Bones, dead trees, a river and massive spikes stand between you and the way
+out. Gather materials, craft a bone axe, a boat and torches, cross the river
+for the tar behind it, and craft the Monolith that marks your way out. The
+look is dark and sparse, and the sound is quiet: soft footsteps and small
+gather and craft sounds.
+
+## How to play
+
+- Arrow keys walk. **G** gathers from the tile you stand on. Each tile gives
+  one item, then turns barren.
+- **1 to 4**, or the recipe buttons, craft in the order the list shows.
+- Trees give wood only once you hold a bone axe. The river is shut until you
+  hold a boat, and it gives tar. Spikes never open.
+- The goal: craft the Monolith.
+
+## Run it locally
+
+Install Deno and Git, run `deno task setup` once, then `deno task dev` and open
+the local URL it prints (normally `http://localhost:3000`). Add `?seed=7` for
+another world. `deno task ci` runs every check.
+
+## Add a recipe
+
+1. Add a row to `RECIPES` in `core/recipes.ts`: `needs`, optional `tools`
+   (held, not used up), `makes`, and `once: true` for something only ever held.
+   Its position is its number key and its button, and the page lists it with no
+   change in `game/`.
+2. A new raw material is a row in `YIELDS` in `core/terrain.ts`. Something that
+   opens a barrier is a row in `ENTRY` in the same file.
+3. Run `deno task test`. `core/content_test.ts` and `core/can_reach_test.ts`
+   fail if something can never be made, and `can_reach_test.ts` spells out the
+   full list of reachable items, so add the new item there.
+4. If tuning breaks the replay in `core/replay_test.ts`, play through again,
+   run `copy(JSON.stringify({ seed: game.state.seed, commands:
+   game.controller.recorded }))` in the browser console, paste it into
+   `core/run.json`, and run `deno task fmt`.
+
 # D3 starter
 
 A walking skeleton: one thin slice of a game that works from end to end. The player moves gridwise over a big seeded world, with a game core that knows nothing about Phaser and a Phaser client that presents what the core reports. Assignment instructions are on Canvas.
